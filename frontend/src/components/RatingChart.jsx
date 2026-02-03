@@ -5,51 +5,92 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    ResponsiveContainer
+    ResponsiveContainer,
+    ReferenceLine
 } from "recharts";
 
-function RatingChart({ history }) {
+function RatingChart({ history, target }) {
 
     const data = history.map((item, index) => ({
         name: index + 1,
-        rating: item.rating,
-        target: 1600
+        rating: item.rating
     }));
 
-
     return (
+
         <div>
-            <h2 className="text-white text-lg font-semibold mb-4">
+
+            <h2 className="text-gray-900 dark:text-white text-lg font-semibold mb-4">
                 Rating Progress
             </h2>
 
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={320}>
+
                 <LineChart data={data}>
-                    <CartesianGrid stroke="rgba(255,255,255,0.1)" />
 
-                    <XAxis dataKey="name" stroke="white" />
-                    <YAxis stroke="white" />
+                    {/* Grid */}
+                    <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="rgba(148,163,184,0.2)"
+                    />
 
-                    <Tooltip />
+                    {/* Axis */}
+                    <XAxis
+                        dataKey="name"
+                        stroke="#94a3b8"
+                        tick={{ fill: "#94a3b8" }}
+                    />
 
+                    <YAxis
+                        stroke="#94a3b8"
+                        tick={{ fill: "#94a3b8" }}
+                        domain={["auto", "auto"]}
+                    />
+
+                    {/* Tooltip */}
+                    <Tooltip
+                        contentStyle={{
+                            backgroundColor: "#0f172a",
+                            borderRadius: "10px",
+                            border: "none",
+                            color: "#fff"
+                        }}
+                        labelStyle={{ color: "#38bdf8" }}
+                    />
+
+                    {/* Target Line */}
+                    <ReferenceLine
+                        y={target}
+                        stroke="#ef4444"
+                        strokeDasharray="6 6"
+                        label={{
+                            value: `🎯 Target ${target}`,
+                            fill: "#ef4444",
+                            position: "right"
+                        }}
+                    />
+
+                    {/* Rating Line */}
                     <Line
                         type="monotone"
                         dataKey="rating"
                         stroke="#22c55e"
                         strokeWidth={3}
-                        dot={{ fill: "#ec4899", r: 5 }}
-                        activeDot={{ r: 7 }}
-                    />
-                    <Line
-                        type="monotone"
-                        dataKey="target"
-                        stroke="#ef4444"
-                        strokeDasharray="5 5"
-                        dot={false}
+                        dot={{
+                            fill: "#22c55e",
+                            r: 4
+                        }}
+                        activeDot={{
+                            r: 7,
+                            stroke: "#22c55e",
+                            strokeWidth: 2
+                        }}
                     />
 
                 </LineChart>
+
             </ResponsiveContainer>
+
         </div>
     );
 }

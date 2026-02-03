@@ -1,24 +1,62 @@
 import { Link } from "react-router-dom";
+import DarkModeToggle from "./DarkModeToggle";
 import { auth } from "../firebase/config";
-import { signOut } from "firebase/auth";
 
 function Navbar() {
 
-    const handleLogout = () => {
-        signOut(auth);
+    const logout = () => {
+        auth.signOut();
     };
 
     return (
-        <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between">
-            <div className="flex gap-6">
-                <Link to="/">Dashboard</Link>
-                <Link to="/cf">CF Tracker</Link>
-                <Link to="/gate">GATE Tracker</Link>
+        <nav className="bg-slate-800 text-white px-6 py-3 flex justify-between items-center">
+
+            {/* LEFT MENU */}
+            <div className="flex gap-6 text-sm font-medium">
+
+                <Link to="/" className="hover:text-blue-400">
+                    Dashboard
+                </Link>
+
+                <Link to="/cf" className="hover:text-blue-400">
+                    CF Tracker
+                </Link>
+
+                <Link to="/gate" className="hover:text-blue-400">
+                    GATE Tracker
+                </Link>
+
+                <Link to="/study" className="hover:text-blue-400">
+                    Study Log
+                </Link>
+
+                <Link to="/goals" className="hover:text-blue-400">
+                    Goal Tracker
+                </Link>
+
+                <Link to="/achievements" className="hover:text-blue-400">
+                    🏅 Achievements
+                </Link>
+                <Link to="/profile" className="hover:text-blue-400">
+                    Profile
+                </Link>
+
             </div>
 
-            <button onClick={handleLogout} className="text-red-400">
-                Logout
-            </button>
+            {/* RIGHT SIDE */}
+            <div className="flex gap-4 items-center">
+
+                <DarkModeToggle />
+
+                <button
+                    onClick={logout}
+                    className="text-red-400 hover:text-red-500"
+                >
+                    Logout
+                </button>
+
+            </div>
+
         </nav>
     );
 }

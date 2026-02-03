@@ -28,7 +28,17 @@ function CFTracker() {
     const [tagStats, setTagStats] = useState({});
     const [accuracy, setAccuracy] = useState(0);
 
-    // 📊 Computed Dashboard Stats
+    // 🎯 Target Rating (Saved Locally)
+    const [targetRating, setTargetRating] = useState(
+        Number(localStorage.getItem("cfTarget")) || 1600
+    );
+
+    useEffect(() => {
+        localStorage.setItem("cfTarget", targetRating);
+    }, [targetRating]);
+
+    // 📊 Computed Stats
+
     const currentRating =
         history.length > 0 ? history[history.length - 1].rating : 0;
 
@@ -39,7 +49,7 @@ function CFTracker() {
 
     const expertProgress =
         currentRating > 0
-            ? Math.min((currentRating / 1600) * 100, 100).toFixed(1)
+            ? Math.min((currentRating / targetRating) * 100, 100).toFixed(1)
             : 0;
 
     // Weekly improvement
@@ -60,6 +70,7 @@ function CFTracker() {
     }
 
     // Load saved history
+
     useEffect(() => {
 
         const loadHistory = async () => {
@@ -85,6 +96,8 @@ function CFTracker() {
 
     }, []);
 
+    // Fetch CF Data
+
     const fetchRating = async () => {
 
         if (!auth.currentUser) {
@@ -100,7 +113,7 @@ function CFTracker() {
         try {
             setLoading(true);
 
-            // 🔥 Fetch rating
+            // Rating
             const res = await axios.get(
                 `https://codeforces.com/api/user.info?handles=${handle.trim()}`
             );
@@ -126,7 +139,7 @@ function CFTracker() {
                 { rating: userRating, date: new Date() }
             ]);
 
-            // 🔥 Fetch submissions
+            // Submissions
             const subRes = await axios.get(
                 `https://codeforces.com/api/user.status?handle=${handle.trim()}`
             );
@@ -161,7 +174,6 @@ function CFTracker() {
                         else if (rating >= 1200 && rating < 1800) medium++;
                         else if (rating >= 1800) hard++;
 
-                        // Tag counting
                         sub.problem.tags.forEach(tag => {
                             tagCount[tag] = (tagCount[tag] || 0) + 1;
                         });
@@ -182,7 +194,7 @@ function CFTracker() {
 
             setTagStats(tagCount);
 
-            // 🔥 Fetch contest history
+            // Contest history
             const contestRes = await axios.get(
                 `https://codeforces.com/api/user.rating?handle=${handle.trim()}`
             );
@@ -196,141 +208,173 @@ function CFTracker() {
         setLoading(false);
     };
 
+    // ================= UI =================
+
     return (
-        <div className="p-6">
 
-            <h1 className="text-2xl font-bold mb-4">
-                Codeforces Tracker
-            </h1>
+        <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-8">
 
-            {/* 📊 DASHBOARD */}
-            <div className="grid grid-cols-9 gap-4 mb-6">
+            {/* HEADER */}
 
-                <div className="bg-blue-100 p-4 rounded shadow">
-                    <p className="text-sm">Current</p>
-                    <p className="text-xl font-bold">{currentRating}</p>
-                </div>
-
-                <div className="bg-green-100 p-4 rounded shadow">
-                    <p className="text-sm">Peak</p>
-                    <p className="text-xl font-bold">{peakRating}</p>
-                </div>
-
-                <div className="bg-purple-100 p-4 rounded shadow">
-                    <p className="text-sm">Expert %</p>
-                    <p className="text-xl font-bold">{expertProgress}%</p>
-                </div>
-
-                <div className="bg-yellow-100 p-4 rounded shadow">
-                    <p className="text-sm">Weekly</p>
-                    <p className="text-xl font-bold">
-                        {weeklyGain >= 0 ? "▲ " : "▼ "}
-                        {weeklyGain}
-                    </p>
-                </div>
-
-                <div className="bg-indigo-100 p-4 rounded shadow">
-                    <p className="text-sm">Solved</p>
-                    <p className="text-xl font-bold">{solvedStats.total}</p>
-                </div>
-
-                <div className="bg-green-200 p-4 rounded shadow">
-                    <p className="text-sm">Easy</p>
-                    <p className="text-xl font-bold">{solvedStats.easy}</p>
-                </div>
-
-                <div className="bg-yellow-200 p-4 rounded shadow">
-                    <p className="text-sm">Medium</p>
-                    <p className="text-xl font-bold">{solvedStats.medium}</p>
-                </div>
-
-                <div className="bg-red-200 p-4 rounded shadow">
-                    <p className="text-sm">Accuracy</p>
-                    <p className="text-xl font-bold">{accuracy}%</p>
-                </div>
-
-                <div className="bg-orange-200 p-4 rounded shadow">
-                    <p className="text-sm">Weak Topic</p>
-                    <p className="text-sm font-bold">{weakestTopic}</p>
-                </div>
-
-            </div>
-
-            {/* INPUT */}
-            <div className="flex items-center gap-3">
-
-                <input
-                    type="text"
-                    placeholder="Enter CF handle"
-                    className="border p-2 rounded"
-                    value={handle}
-                    onChange={(e) => setHandle(e.target.value)}
-                />
-
-                <button
-                    onClick={fetchRating}
-                    disabled={loading}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-                >
-                    {loading ? "Fetching..." : "Fetch Rating"}
-                </button>
-
-            </div>
-
-            {rating !== null && (
-                <p className="mt-4 text-lg">
-                    Current Rating: <b>{rating}</b>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    Codeforces Tracker
+                </h1>
+                <p className="text-gray-500 dark:text-slate-400">
+                    Analyze your competitive programming journey
                 </p>
-            )}
+            </div>
 
-            {/* GRAPH */}
-            {history.length > 0 && (
-                <div className="bg-gray-900 p-6 rounded-xl mt-6 shadow-lg">
-                    <RatingChart history={history} />
+            {/* KPI GRID */}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-9 gap-4 mb-8">
+
+                {[
+                    { label: "Current", value: currentRating },
+                    { label: "Peak", value: peakRating },
+                    { label: "Target %", value: `${expertProgress}%` },
+                    { label: "Weekly", value: `${weeklyGain >= 0 ? "▲" : "▼"} ${weeklyGain}` },
+                    { label: "Solved", value: solvedStats.total },
+                    { label: "Easy", value: solvedStats.easy },
+                    { label: "Medium", value: solvedStats.medium },
+                    { label: "Accuracy", value: `${accuracy}%` },
+                    { label: "Weak Topic", value: weakestTopic }
+                ].map((item, i) => (
+
+                    <div
+                        key={i}
+                        className="bg-white dark:bg-white/5 backdrop-blur border border-gray-200 dark:border-white/10 rounded-xl p-4 shadow-md dark:shadow-xl"
+                    >
+
+                        <p className="text-sm text-gray-500 dark:text-slate-400">
+                            {item.label}
+                        </p>
+
+                        <p className="text-xl font-bold text-gray-900 dark:text-white">
+                            {item.value}
+                        </p>
+
+                    </div>
+
+                ))}
+
+            </div>
+
+            {/* CONTROL PANEL */}
+
+            <div className="bg-white dark:bg-white/5 backdrop-blur border border-gray-200 dark:border-white/10 rounded-xl p-6 mb-8 shadow-md dark:shadow-xl">
+
+                <div className="flex flex-wrap gap-4 items-center">
+
+                    <input
+                        type="text"
+                        placeholder="Enter CF handle"
+                        className="px-4 py-2 rounded-lg border bg-gray-50 dark:bg-slate-900 dark:text-white outline-none"
+                        value={handle}
+                        onChange={(e) => setHandle(e.target.value)}
+                    />
+
+                    <button
+                        onClick={fetchRating}
+                        disabled={loading}
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-lg shadow hover:opacity-90 disabled:opacity-50"
+                    >
+                        {loading ? "Fetching..." : "Fetch Rating"}
+                    </button>
+
+                    {/* TARGET */}
+
+                    <div className="flex items-center gap-2 ml-auto">
+
+                        <span className="text-gray-500 dark:text-slate-400 text-sm">
+                            🎯 Target
+                        </span>
+
+                        <input
+                            type="number"
+                            value={targetRating}
+                            onChange={(e) => setTargetRating(Number(e.target.value))}
+                            className="w-24 px-3 py-2 rounded-lg border bg-gray-50 dark:bg-slate-900 dark:text-white outline-none"
+                        />
+
+                    </div>
+
                 </div>
+
+            </div>
+
+            {/* CHART */}
+
+            {history.length > 0 && (
+
+                <div className="bg-white dark:bg-white/5 backdrop-blur border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-md dark:shadow-xl mb-8">
+
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        📈 Rating Progress
+                    </h2>
+
+                    <RatingChart history={history} target={targetRating} />
+
+                </div>
+
             )}
 
             {/* CONTEST TABLE */}
-            {contestHistory.length > 0 && (
-                <div className="mt-8">
 
-                    <h2 className="text-xl font-bold mb-4">
-                        Recent Contest Performance
+            {contestHistory.length > 0 && (
+
+                <div className="bg-white dark:bg-white/5 backdrop-blur border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-md dark:shadow-xl">
+
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        🏆 Recent Contest Performance
                     </h2>
 
-                    <table className="w-full border">
+                    <div className="overflow-x-auto">
 
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="p-2">Contest</th>
-                                <th className="p-2">Rank</th>
-                                <th className="p-2">Δ Rating</th>
-                            </tr>
-                        </thead>
+                        <table className="w-full text-sm">
 
-                        <tbody>
-                            {contestHistory.map((c, index) => (
-                                <tr key={index} className="text-center border-t">
-
-                                    <td className="p-2">{c.contestName}</td>
-                                    <td className="p-2">{c.rank}</td>
-
-                                    <td
-                                        className={`p-2 font-bold ${c.newRating - c.oldRating >= 0
-                                                ? "text-green-600"
-                                                : "text-red-600"
-                                            }`}
-                                    >
-                                        {c.newRating - c.oldRating}
-                                    </td>
-
+                            <thead className="bg-gray-100 dark:bg-slate-800">
+                                <tr>
+                                    <th className="p-3 text-left">Contest</th>
+                                    <th className="p-3">Rank</th>
+                                    <th className="p-3">Δ Rating</th>
                                 </tr>
-                            ))}
-                        </tbody>
+                            </thead>
 
-                    </table>
+                            <tbody>
+
+                                {contestHistory.map((c, index) => {
+
+                                    const diff = c.newRating - c.oldRating;
+
+                                    return (
+                                        <tr key={index} className="border-t text-center">
+
+                                            <td className="p-3 text-left">
+                                                {c.contestName}
+                                            </td>
+
+                                            <td className="p-3">
+                                                {c.rank}
+                                            </td>
+
+                                            <td className={`p-3 font-bold ${diff >= 0 ? "text-green-500" : "text-red-500"}`}>
+                                                {diff}
+                                            </td>
+
+                                        </tr>
+                                    );
+
+                                })}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
 
                 </div>
+
             )}
 
         </div>

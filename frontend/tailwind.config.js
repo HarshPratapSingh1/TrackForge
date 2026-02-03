@@ -1,10 +1,11 @@
-export default {
+module.exports = {
+  darkMode: "class",   // IMPORTANT
   content: [
     "./index.html",
-    "./src/**/*.{js,jsx}",
+    "./src/**/*.{js,jsx}"
   ],
   theme: {
-    extend: {},
+    extend: {}
   },
-  plugins: [],
+  plugins: []
 };
