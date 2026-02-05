@@ -77,3 +77,62 @@ It helps you **track daily study sessions, maintain streaks, monitor syllabus pr
 
 ## 📁 Project Structure
 
+src/
+├── components/
+│ ├── Navbar.jsx
+│ ├── SkeletonCard.jsx
+│ ├── StudyHeatmap.jsx
+│
+├── pages/
+│ ├── Dashboard.jsx
+│ ├── StudyLog.jsx
+│ ├── GoalTracker.jsx
+│ ├── GateTracker.jsx
+│ ├── Profile.jsx
+│
+├── context/
+│ └── ThemeContext.jsx
+│
+├── firebase/
+│ └── config.js
+│
+├── utils/
+│ └── achievementRules.js
+│
+└── App.jsx
+
+
+
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the root of your project:
+
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+
+⚠️ Never commit .env files to GitHub
+
+
+
+🚀 Getting Started
+1️⃣ Clone the Repository
+git clone https://github.com/your-username/trackforge.git
+cd trackforge
+
+2️⃣ Install Dependencies
+npm install
+
+3️⃣ Add Environment Variables
+
+Create .env as shown above.
+
+4️⃣ Run Locally
+npm run dev
