@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400..900;1,400..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,26 +14,22 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* ================= GLASS CARDS ================= */
-
-/* ================= GLASS CARD ================= */
-
-/* LIGHT MODE */
+/* ================= GLASS UI ================= */
 
 .glass {
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(14px);
     border-radius: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
-/* DARK MODE */
+/* Dark Mode Glass */
 
 .dark .glass {
     background: rgba(15, 23, 42, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
 /* Light mode cards */
@@ -172,4 +170,18 @@ body {
 
 ::-webkit-scrollbar-track {
     background: transparent;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.animate-shimmer {
+    animation: shimmer 1.5s infinite;
 }
